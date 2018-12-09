@@ -1,6 +1,6 @@
 
 const service = require('../service/dailyService.js')
-
+const sendMail = require('../lib/sendmail')
 
 module.exports = router =>{
     router.post('/add', async(ctx) => {
@@ -17,4 +17,10 @@ module.exports = router =>{
        }
        ctx.body = data
     })
+    router.get('/sendmail', async(ctx) => {
+        let res = await sendMail()
+        console.log(res)
+        ctx.body = "send mail"
+    })
+
 }

@@ -1,10 +1,48 @@
-const Koa = require('koa');
-const cors = require('koa-cors')
-const path = require('path')
-const routers = require('./routers')
-const bodyParser = require('koa-bodyparser')
-const static = require('koa-static')
-const app = new Koa();
+const Koa = require('koa'),
+      cors = require('koa-cors'),
+      path = require('path'),
+      routes = require('./routers'),
+      bodyParser = require('koa-bodyparser'),
+      requestTime = require('./middlewares/requestTime')
+      static = require('koa-static'),
+      logger = require('./lib/logger'),
+      app = new Koa()
+      port = 3000
+
+const start = async () => {
+    global.logger = logger 
+    app.env = process.env.NODE_ENV || "development"
+    
+    app.use(requestTime)
+       .use(cors())
+       .use(bodyParser())
+       .use(static(
+            path.join( __dirname, './static')
+        ))
+
+    for(router of routes) app.use(router.routes())
+
+    app.listen(port)
+
+    logger.info(`app started on port ${port} env is ${app.env}`);
+
+}
+start().catch(e => console.log(e))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // app.use( async(ctx,next)=>{
 //     console.log(ctx.set)
 //     let {method, url, header} = ctx.request;
@@ -23,8 +61,8 @@ const app = new Koa();
 // });
 
 
-app.use(cors())
-app.use(bodyParser())
+// app.use(cors())
+// app.use(bodyParser())
 // app.use(cors({
 //     origin: function (ctx) {
 //         if (ctx.url === '/test') {
@@ -38,15 +76,15 @@ app.use(bodyParser())
 //     // allowMethods: ['GET', 'POST', 'DELETE'],
 //     // allowHeaders: ['Content-Type', 'Authorization', 'Accept'],
 // }))
-for (const router of routers) {
-    app.use(router.routes())
-}
-app.use(static(
-    path.join( __dirname, './static')
-))
+// for (const router of routers) {
+//     app.use(router.routes())
+// }
+// app.use(static(
+//     path.join( __dirname, './static')
+// ))
 // app.use(router.routes())
 // app.use(async ctx => {
 //   ctx.body = 'Hello World';
 // });
 
-app.listen(3000);
+// app.listen(3000);
